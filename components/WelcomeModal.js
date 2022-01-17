@@ -56,5 +56,3 @@ export default function WelcomeModal({
 		</Modal>
 	);
 }
-
-const styles = StyleSheet.create({});

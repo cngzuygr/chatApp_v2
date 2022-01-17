@@ -1,24 +1,31 @@
 import { useAssets } from "expo-asset";
 import { StatusBar } from "expo-status-bar";
-import React, { useEffect, useState } from "react";
+import React, { useContext, useEffect, useLayoutEffect, useState } from "react";
 import {
 	ActivityIndicator,
 	StyleSheet,
 	Text,
 	View,
 	LogBox,
+	TouchableOpacity,
 } from "react-native";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "./firebase";
-import { NavigationContainer } from "@react-navigation/native";
+import { NavigationContainer, useNavigation } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
+import { createMaterialTopTabNavigator } from "@react-navigation/material-top-tabs";
 import ContextWrapper from "./context/ContextWrapper";
-import WelcomeScreen from "./screens/WelcomeScreen";
+import GlobalContext from "./context/Context";
 import { Provider } from "react-redux";
 import { store } from "./store";
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
+import WelcomeScreen from "./screens/WelcomeScreen";
 import VerifyScreen from "./screens/VerifyScreen";
 import UpdateProfileScreen from "./screens/UpdateProfileScreen";
-import HomeScreen from "./screens/HomeScreen";
+import SendPhotoScreen from "./screens/SendPhotoScreen";
+import ChatsScreen from "./screens/ChatsScreen";
+import sa from "./screens/sa";
+import CallsScreen from "./screens/CallsScreen";
 
 //Ignoring warning logs
 LogBox.ignoreLogs([
@@ -30,10 +37,12 @@ LogBox.ignoreLogs([
 
 //React navigation
 const Stack = createStackNavigator();
+const Tab = createMaterialTopTabNavigator();
 
 function App() {
 	const [currUser, setCurrUser] = useState(null);
 	const [loading, setLoading] = useState(true);
+
 	useEffect(() => {
 		const unsubscribe = onAuthStateChanged(auth, (user) => {
 			setLoading(false);
@@ -55,14 +64,20 @@ function App() {
 							<Stack.Screen name="VerifyScreen" component={VerifyScreen} />
 						</Stack.Navigator>
 					) : (
-						<Stack.Navigator screenOptions={{ headerShown: false }}>
+						<Stack.Navigator>
 							{!currUser.displayName && (
 								<Stack.Screen
 									name="UpdateProfileScreen"
 									component={UpdateProfileScreen}
+									options={{ headerShown: false }}
 								/>
 							)}
-							<Stack.Screen name="HomeScreen" component={HomeScreen} />
+							<Stack.Screen
+								name="HomeScreen"
+								component={HomeScreen}
+								options={{ headerShown: false }}
+							/>
+							<Stack.Screen name="sa" component={sa} />
 						</Stack.Navigator>
 					)}
 				</NavigationContainer>
@@ -73,6 +88,85 @@ function App() {
 				</View>
 			)}
 		</>
+	);
+}
+
+function HomeScreen() {
+	const {
+		theme: { colors },
+	} = useContext(GlobalContext);
+
+	return (
+		<Tab.Navigator
+			screenOptions={({ route }) => {
+				return {
+					tabBarLabel: () => {
+						if (route.name === "SendPhotoScreen") {
+							return (
+								<View
+									style={{
+										flexDirection: "row",
+										justifyContent: "center",
+										alignItems: "center",
+									}}
+								>
+									<Ionicons name="camera" size={20} color="white" />
+								</View>
+							);
+						}
+						if (route.name === "ChatsScreen") {
+							return (
+								<View
+									style={{
+										flexDirection: "row",
+										justifyContent: "center",
+										alignItems: "center",
+									}}
+								>
+									<MaterialIcons
+										name="chat-bubble-outline"
+										size={22}
+										color="white"
+									/>
+									<Text style={{ color: "white", marginLeft: 5 }}>Chats</Text>
+								</View>
+							);
+						}
+						if (route.name === "CallsScreen") {
+							return (
+								<View
+									style={{
+										flexDirection: "row",
+										justifyContent: "center",
+										alignItems: "center",
+									}}
+								>
+									<MaterialIcons name="phone" size={22} color="white" />
+									<Text style={{ color: "white", marginLeft: 5 }}>Calls</Text>
+								</View>
+							);
+						}
+					},
+					tabBarShowIcon: true,
+					tabBarLabelStyle: {
+						color: "white",
+					},
+					tabBarIndicatorStyle: {
+						backgroundColor: "yellow",
+					},
+					tabBarStyle: {
+						backgroundColor: colors.bottomTabs,
+						width: "100%",
+					},
+				};
+			}}
+			tabBarPosition="bottom"
+			initialRouteName="ChatsScreen"
+		>
+			<Tab.Screen name="SendPhotoScreen" component={SendPhotoScreen} />
+			<Tab.Screen name="ChatsScreen" component={ChatsScreen} />
+			<Tab.Screen name="CallsScreen" component={CallsScreen} />
+		</Tab.Navigator>
 	);
 }
 
