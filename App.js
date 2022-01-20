@@ -1,13 +1,12 @@
 import { useAssets } from "expo-asset";
 import { StatusBar } from "expo-status-bar";
-import React, { useContext, useEffect, useLayoutEffect, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import {
 	ActivityIndicator,
 	StyleSheet,
 	Text,
 	View,
 	LogBox,
-	TouchableOpacity,
 } from "react-native";
 import { onAuthStateChanged } from "firebase/auth";
 import { auth } from "./firebase";
@@ -24,8 +23,10 @@ import VerifyScreen from "./screens/VerifyScreen";
 import UpdateProfileScreen from "./screens/UpdateProfileScreen";
 import SendPhotoScreen from "./screens/SendPhotoScreen";
 import ChatsScreen from "./screens/ChatsScreen";
-import sa from "./screens/sa";
 import CallsScreen from "./screens/CallsScreen";
+import ContactsScreen from "./screens/ContactsScreen";
+import ChatScreen from "./screens/ChatScreen";
+import ChatHeader from "./components/ChatHeader";
 
 //Ignoring warning logs
 LogBox.ignoreLogs([
@@ -77,7 +78,24 @@ function App() {
 								component={HomeScreen}
 								options={{ headerShown: false }}
 							/>
-							<Stack.Screen name="sa" component={sa} />
+							<Stack.Screen
+								name="ContactsScreen"
+								component={ContactsScreen}
+								options={{
+									title: "Select a Contact",
+									headerStyle: { backgroundColor: "#e63946ff" },
+									headerTintColor: "#f1faeeff",
+								}}
+							/>
+							<Stack.Screen
+								name="ChatScreen"
+								component={ChatScreen}
+								options={{
+									headerTitle: (props) => <ChatHeader {...props} />,
+									headerTintColor: "#f1faeeff",
+									headerStyle: { backgroundColor: "#e63946ff" },
+								}}
+							/>
 						</Stack.Navigator>
 					)}
 				</NavigationContainer>
@@ -155,7 +173,7 @@ function HomeScreen() {
 						backgroundColor: "yellow",
 					},
 					tabBarStyle: {
-						backgroundColor: colors.bottomTabs,
+						backgroundColor: colors.foreground,
 						width: "100%",
 					},
 				};
